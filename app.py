@@ -1,37 +1,33 @@
 import streamlit as st
 import pandas as pd
 
-# Tytuł aplikacji
-st.title("Grupowanie laptopów")
+# Funkcja do wczytywania i przetwarzania danych z Excela
+def process_excel(file):
+    # Wczytaj dane z pliku Excel
+    df = pd.read_excel(file, sheet_name=None)
+    
+    # Zakładamy, że dane zaczynają się od A2, więc musimy odpowiednio ustawić nagłówki
+    sheet_name = list(df.keys())[0]  # Zakłada, że dane są w pierwszym arkuszu
+    data = df[sheet_name]
+    
+    # Wybieramy tylko dane od wiersza 2 (pomiń nagłówki)
+    data.columns = data.iloc[1]  # Ustawiamy drugi wiersz jako nagłówki
+    data = data.drop([0, 1])  # Usuwamy wiersze 0 i 1 (zawierające dane i nagłówki)
+    
+    # Przykład grupowania według nazwy modelu i sumowania ilości
+    grouped_data = data.groupby('Model').agg({'Cena': 'sum', 'Ilość': 'sum'}).reset_index()
 
-# Wczytanie pliku Excela
-uploaded_file = st.file_uploader("Wybierz plik Excel", type=["xlsx", "xls"])
+    return grouped_data
+
+# Interfejs użytkownika w Streamlit
+st.title("Grupowanie danych laptopów")
+
+uploaded_file = st.file_uploader("Wybierz plik Excel", type=["xlsx"])
 
 if uploaded_file is not None:
-    # Wczytanie danych z Excela do DataFrame
-    df = pd.read_excel(uploaded_file)
-
-    # Wyświetlenie surowych danych (opcjonalne)
-    st.subheader("Surowe dane")
-    st.dataframe(df)
-
-    # Wybór kolumny do grupowania
-    group_by_column = st.selectbox("Wybierz kolumnę do grupowania", df.columns)
-
-    # Grupowanie danych
-    grouped_data = df.groupby(group_by_column).size().reset_index(name='Liczba egzemplarzy')
-
-    # Wyświetlenie pogrupowanych danych
-    st.subheader(f"Pogrupowane dane według {group_by_column}")
-    st.dataframe(grouped_data)
-
-    # Opcjonalnie: możliwość filtrowania po innych kolumnach
-    st.subheader("Filtrowanie danych")
-    filter_column = st.selectbox("Wybierz kolumnę do filtrowania", df.columns)
-    unique_values = df[filter_column].unique()
-    selected_value = st.selectbox(f"Wybierz wartość w {filter_column}", unique_values)
+    # Przetwarzamy dane z pliku
+    grouped_data = process_excel(uploaded_file)
     
-    filtered_data = df[df[filter_column] == selected_value]
-    st.dataframe(filtered_data)
-else:
-    st.write("Proszę załadować plik Excel, aby kontynuować.")
+    # Wyświetlamy grupowane dane
+    st.write(grouped_data)
+
