@@ -1,29 +1,26 @@
 import streamlit as st
 import pandas as pd
+from openpyxl import load_workbook
 
-# Funkcja do wczytywania i przetwarzania danych z Excela
+# Funkcja do wczytywania danych z pliku Excel
 def process_excel(file):
     try:
-        # Wczytanie pliku Excel
-        df = pd.read_excel(file, sheet_name=None)
-        
-        # Wyświetlamy dostępne arkusze w pliku
-        sheet_names = list(df.keys())
-        st.write(f"Dostępne arkusze: {sheet_names}")
-        
-        # Wybieramy pierwszy arkusz (jeśli jest tylko jeden, lub możesz wybrać konkretny)
-        sheet_name = sheet_names[0]  # Wybór pierwszego arkusza
-        data = df[sheet_name]
+        # Załaduj plik przy pomocy openpyxl
+        wb = load_workbook(file)
+        sheet = wb.active  # Wybierz aktywny arkusz
 
-        # Sprawdzamy nagłówki, zakładając, że zaczynają się od wiersza 2 (A2)
-        data.columns = data.iloc[1]  # Ustawiamy drugi wiersz jako nagłówki
-        data = data.drop([0, 1])  # Usuwamy wiersze 0 i 1 (zawierające dane i nagłówki)
+        # Wczytanie danych do pandas
+        data = pd.read_excel(file, sheet_name=sheet.title)
 
-        # Sprawdzamy pierwsze wiersze danych
-        st.write("Pierwsze dane:", data.head())
+        # Wyświetlamy pierwsze 5 wierszy danych, aby sprawdzić strukturę
+        st.write("Pierwsze dane w pliku:")
+        st.write(data.head())
 
-        # Przykład grupowania według nazwy modelu i sumowania ilości
-        grouped_data = data.groupby('Model').agg({'Cena': 'sum', 'Ilość': 'sum'}).reset_index()
+        # Sprawdzamy kolumny, aby wiedzieć, jak pogrupować dane
+        st.write("Kolumny w pliku:", data.columns)
+
+        # Grupowanie danych według kolumny 'Task Name' (lub innej kolumny)
+        grouped_data = data.groupby('Task Name').size().reset_index(name='Ilość laptopów')
 
         return grouped_data
 
@@ -42,4 +39,5 @@ if uploaded_file is not None:
     
     if grouped_data is not None:
         # Wyświetlamy grupowane dane
-        st.write("Zgrupowane dane:", grouped_data)
+        st.write("Zgrupowane dane:")
+        st.write(grouped_data)
