@@ -24,8 +24,8 @@ def process_excel(file):
             if i % 6 == 3:  # Każdy 4. wiersz (A4, A9, itd.) to model
                 data.loc[i, 'Model'] = model_names[model_idx]
                 model_idx += 1
-            else:
-                data.loc[i, 'Model'] = data.loc[i-1, 'Model']  # Przypisanie poprzedniego modelu dla wierszy Task ID i egzemplarzy
+            elif i > 3 and data.loc[i-1, 'Model'] is not None:
+                data.loc[i, 'Model'] = data.loc[i-1, 'Model']  # Przypisanie modelu do kolejnych wierszy
 
         # Grupowanie danych według modeli
         grouped_data = data.groupby('Model').agg({'Task ID': 'count'}).reset_index()
