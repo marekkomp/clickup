@@ -15,28 +15,28 @@ if uploaded_file is not None:
 
     # Sprawdzanie, czy kolumna 'tags' istnieje w pliku
     if 'tags' in df.columns:
-        # Dodanie opcji 'Wszystkie' w filtrze 'tags'
-        tag_selected = st.selectbox("Wybierz tag, aby zobaczyć szczegóły", ['Wszystkie'] + list(df['tags'].unique()))
+        # Dodanie opcji 'Wszystkie modele' w filtrze 'tags'
+        tag_selected = st.selectbox("Wybierz model, aby zobaczyć szczegóły", ['Wszystkie modele'] + list(df['tags'].unique()))
 
-        # Jeżeli wybrano 'Wszystkie', zliczamy wszystkie tagi razem
-        if tag_selected == 'Wszystkie':
+        # Jeżeli wybrano 'Wszystkie modele', zliczamy wszystkie tagi razem
+        if tag_selected == 'Wszystkie modele':
             filtered_data = df
             grouped_data = filtered_data.groupby('tags').size().reset_index(name='Liczba wystąpień')
-            st.write(f"Grupa: Wszystkie tagi (razem {grouped_data['Liczba wystąpień'].sum()} sztuk)", grouped_data)
+            st.write(f"Grupa: Wszystkie modele (razem {grouped_data['Liczba wystąpień'].sum()} sztuk)", grouped_data)
         else:
-            # Filtrowanie danych po wybranym tagu
+            # Filtrowanie danych po wybranym modelu
             filtered_data = df[df['tags'] == tag_selected]
         
         # Opcjonalne filtry: Lists i Przeznaczenie
-        # Filtracja po "Lists"
+        # Filtracja po "Lists" z nazwą "Wybierz dostawę"
         if 'Lists' in df.columns:
-            list_selected = st.selectbox("Wybierz Listę (opcjonalnie)", ['Wszystkie'] + list(filtered_data['Lists'].unique()))
+            list_selected = st.selectbox("Wybierz dostawę (opcjonalnie)", ['Wszystkie'] + list(filtered_data['Lists'].unique()))
             if list_selected != 'Wszystkie':
                 filtered_data = filtered_data[filtered_data['Lists'] == list_selected]
 
-        # Filtracja po "Przeznaczenie" z nazwą "Przeznaczenie (drop down)"
+        # Filtracja po "Przeznaczenie" z nazwą "Przeznaczenie"
         if 'Przeznaczenie' in df.columns:
-            przeznaczenie_selected = st.selectbox("Przeznaczenie (drop down)", ['Wszystkie'] + list(filtered_data['Przeznaczenie'].unique()))
+            przeznaczenie_selected = st.selectbox("Przeznaczenie", ['Wszystkie'] + list(filtered_data['Przeznaczenie'].unique()))
             if przeznaczenie_selected != 'Wszystkie':
                 filtered_data = filtered_data[filtered_data['Przeznaczenie'] == przeznaczenie_selected]
 
