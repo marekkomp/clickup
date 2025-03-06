@@ -28,8 +28,9 @@ if uploaded_file is not None:
             unique_processors = df["Procesor (drop down)"].unique().tolist()
             selected_processor = st.sidebar.selectbox("Wybierz procesor", ["Wszystkie"] + unique_processors)
             
-            # Filtr dla "Model Procesora (short text)"
-            processor_model = st.sidebar.text_input("Model Procesora (short text)", "")
+            # Filtr dla "Model Procesora (short text)" - zmieniony na drop down
+            unique_processor_models = df["Model Procesora (short text)"].unique().tolist()
+            selected_processor_model = st.sidebar.selectbox("Wybierz model procesora", ["Wszystkie"] + unique_processor_models)
             
             # Filtr dla "Rozdzielczość (drop down)"
             unique_resolutions = df["Rozdzielczość (drop down)"].unique().tolist()
@@ -46,9 +47,9 @@ if uploaded_file is not None:
             if selected_processor != "Wszystkie":
                 filtered_df = filtered_df[filtered_df["Procesor (drop down)"] == selected_processor]
                 
-            # Filtrowanie po "Model Procesora (short text)" (częściowe dopasowanie)
-            if processor_model:
-                filtered_df = filtered_df[filtered_df["Model Procesora (short text)"].str.contains(processor_model, case=False, na=False)]
+            # Filtrowanie po "Model Procesora (short text)"
+            if selected_processor_model != "Wszystkie":
+                filtered_df = filtered_df[filtered_df["Model Procesora (short text)"] == selected_processor_model]
                 
             # Filtrowanie po "Rozdzielczość (drop down)"
             if selected_resolution != "Wszystkie":
