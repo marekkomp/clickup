@@ -1,6 +1,9 @@
 import pandas as pd
 import streamlit as st
 
+# Tytuł aplikacji
+st.title("Magazyn z ClickUp - aktualizacja 06.03.2025 - wersja BETA")
+
 # Ścieżka do pliku CSV w folderze z kodem
 file_path = "nazwa_pliku.csv"  # Zmień na rzeczywistą nazwę swojego pliku
 
