@@ -13,9 +13,6 @@ if uploaded_file is not None:
         # Wczytanie pliku Excel
         df = pd.read_excel(uploaded_file)
 
-    # Usuwanie wierszy z NaN w kolumnach 'tags', 'Lists', 'Przeznaczenie' (jeśli występują)
-    df = df.dropna(subset=['tags', 'Lists', 'Przeznaczenie'], how='any')  # Usuwa wiersze, gdzie którakolwiek z tych kolumn ma NaN
-
     # Sprawdzanie, czy kolumna 'tags' istnieje w pliku
     if 'tags' in df.columns:
         # Dodanie opcji 'Wszystkie' w filtrze 'tags'
@@ -42,9 +39,6 @@ if uploaded_file is not None:
             przeznaczenie_selected = st.selectbox("Przeznaczenie (drop down)", ['Wszystkie'] + list(filtered_data['Przeznaczenie'].unique()))
             if przeznaczenie_selected != 'Wszystkie':
                 filtered_data = filtered_data[filtered_data['Przeznaczenie'] == przeznaczenie_selected]
-
-        # Usuwanie NaN w wynikach po filtracji
-        filtered_data = filtered_data.dropna()  # Usuwa wiersze z NaN w wynikach filtracji
 
         # Wyświetlenie przefiltrowanych danych
         st.write("Dane po zastosowaniu filtrów:", filtered_data)
