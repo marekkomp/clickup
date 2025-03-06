@@ -35,5 +35,22 @@ if uploaded_file is not None:
         # Wyświetlenie szczegółów dla wybranego tagu
         st.write(f"Lista urządzeń dla tagu: {tag_selected}", filtered_data)
 
+        # Filtracja po "Lists"
+        if 'Lists' in df.columns:
+            lists_options = df['Lists'].unique().tolist()
+            list_selected = st.selectbox("Filtruj po 'Lists'", ["Wszystkie"] + lists_options)
+            if list_selected != "Wszystkie":
+                filtered_data = filtered_data[filtered_data['Lists'] == list_selected]
+
+        # Filtracja po "Przeznaczenie"
+        if 'Przeznaczenie' in df.columns:
+            przeznaczenie_options = df['Przeznaczenie'].unique().tolist()
+            przeznaczenie_selected = st.selectbox("Filtruj po 'Przeznaczenie'", ["Wszystkie"] + przeznaczenie_options)
+            if przeznaczenie_selected != "Wszystkie":
+                filtered_data = filtered_data[filtered_data['Przeznaczenie'] == przeznaczenie_selected]
+
+        # Wyświetlenie przefiltrowanych danych
+        st.write("Przefiltrowane dane:", filtered_data)
+
     else:
         st.warning("Brak kolumny 'tags' w pliku.")
