@@ -21,36 +21,27 @@ if uploaded_file is not None:
         # Grupowanie danych po 'tags' i zliczanie liczby wystąpień każdego tagu
         grouped_data = df.groupby('tags').size().reset_index(name='Liczba wystąpień')
 
-        # Stworzenie rozwijanego panelu do wyświetlania wyników grupowania
-        with st.expander("Kliknij, aby rozwinąć grupy po tagach"):
-            # Wyświetlenie pogrupowanych danych
-            st.write(grouped_data)
-
-        # Wybór tagu do szczegółowego podglądu
+        # Wybór tagu
         tag_selected = st.selectbox("Wybierz tag, aby zobaczyć szczegóły", grouped_data['tags'])
 
-        # Filtrowanie danych dla wybranego tagu
+        # Filtrowanie danych po wybranym tagu
         filtered_data = df[df['tags'] == tag_selected]
 
-        # Wyświetlenie szczegółów dla wybranego tagu
-        st.write(f"Lista urządzeń dla tagu: {tag_selected}", filtered_data)
-
+        # Opcjonalne filtry: Lists i Przeznaczenie
         # Filtracja po "Lists"
         if 'Lists' in df.columns:
-            lists_options = df['Lists'].unique().tolist()
-            list_selected = st.selectbox("Filtruj po 'Lists'", ["Wszystkie"] + lists_options)
-            if list_selected != "Wszystkie":
+            list_selected = st.selectbox("Wybierz Listę (opcjonalnie)", ['Wszystkie'] + list(filtered_data['Lists'].unique()))
+            if list_selected != 'Wszystkie':
                 filtered_data = filtered_data[filtered_data['Lists'] == list_selected]
 
         # Filtracja po "Przeznaczenie"
         if 'Przeznaczenie' in df.columns:
-            przeznaczenie_options = df['Przeznaczenie'].unique().tolist()
-            przeznaczenie_selected = st.selectbox("Filtruj po 'Przeznaczenie'", ["Wszystkie"] + przeznaczenie_options)
-            if przeznaczenie_selected != "Wszystkie":
+            przeznaczenie_selected = st.selectbox("Wybierz Przeznaczenie (opcjonalnie)", ['Wszystkie'] + list(filtered_data['Przeznaczenie'].unique()))
+            if przeznaczenie_selected != 'Wszystkie':
                 filtered_data = filtered_data[filtered_data['Przeznaczenie'] == przeznaczenie_selected]
 
-        # Wyświetlenie przefiltrowanych danych
-        st.write("Przefiltrowane dane:", filtered_data)
+        # Wyświetlenie pogrupowanych danych
+        st.write(f"Lista urządzeń dla tagu: {tag_selected}", filtered_data)
 
     else:
         st.warning("Brak kolumny 'tags' w pliku.")
