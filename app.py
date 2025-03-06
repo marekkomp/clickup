@@ -13,13 +13,13 @@ if uploaded_file is not None:
         # Wczytanie pliku Excel
         df = pd.read_excel(uploaded_file)
 
-    # Wyświetlenie surowych danych
-    st.write("Dane z pliku:", df)
-
     # Sprawdzanie, czy kolumna 'tags' istnieje w pliku
     if 'tags' in df.columns:
-        # Dodanie opcji 'Wszystkie' w filtrze 'tags'
-        tag_selected = st.selectbox("Wybierz tag, aby zobaczyć szczegóły", ['Wszystkie'] + list(df['tags'].unique()))
+        # Grupowanie danych po 'tags' i zliczanie liczby wystąpień każdego tagu
+        grouped_data = df.groupby('tags').size().reset_index(name='Liczba wystąpień')
+
+        # Wybór tagu
+        tag_selected = st.selectbox("Wybierz tag, aby zobaczyć szczegóły", ['Wszystkie'] + list(grouped_data['tags']))
 
         # Jeżeli wybrano 'Wszystkie', zliczamy wszystkie tagi razem
         if tag_selected == 'Wszystkie':
