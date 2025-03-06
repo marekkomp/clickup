@@ -82,6 +82,19 @@ try:
         
         # Wyświetlanie liczby pokazywanych pozycji
         st.write(f"Liczba pokazywanych pozycji: {len(filtered_df)}")
+        
+        # Przygotowanie pliku Excel do pobrania
+        excel_buffer = pd.ExcelWriter('filtered_data.xlsx', engine='xlsxwriter')
+        filtered_df.to_excel(excel_buffer, index=False)
+        excel_buffer.close()
+        
+        with open("filtered_data.xlsx", "rb") as f:
+            st.download_button(
+                label="Pobierz dane jako Excel",
+                data=f,
+                file_name="filtered_data.xlsx",
+                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            )
 
 except pd.errors.ParserError as e:
     st.error(f"Błąd parsowania pliku CSV: {e}")
