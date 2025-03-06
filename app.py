@@ -13,6 +13,9 @@ if uploaded_file is not None:
         # Wczytanie pliku Excel
         df = pd.read_excel(uploaded_file)
 
+    # Usuwanie wierszy z NaN w kolumnach 'tags', 'Lists', 'Przeznaczenie' (jeśli występują)
+    df = df.dropna(subset=['tags', 'Lists', 'Przeznaczenie'], how='any')  # Usuwa wiersze, gdzie którakolwiek z tych kolumn ma NaN
+
     # Sprawdzanie, czy kolumna 'tags' istnieje w pliku
     if 'tags' in df.columns:
         # Dodanie opcji 'Wszystkie' w filtrze 'tags'
@@ -27,18 +30,21 @@ if uploaded_file is not None:
             # Filtrowanie danych po wybranym tagu
             filtered_data = df[df['tags'] == tag_selected]
         
-        # Opcjonalne filtry: Lists i Przeznaczenie
-        # Filtracja po "Lists"
+        # Opcjonalne filtry: Lists i Przeznaczenie z wielowymiarowym wyborem
+        # Filtracja po "Lists" z wielowymiarowym wyborem
         if 'Lists' in df.columns:
-            list_selected = st.selectbox("Wybierz Listę (opcjonalnie)", ['Wszystkie'] + list(filtered_data['Lists'].unique()))
-            if list_selected != 'Wszystkie':
-                filtered_data = filtered_data[filtered_data['Lists'] == list_selected]
+            list_selected = st.multiselect("Wybierz Listę (opcjonalnie)", list(filtered_data['Lists'].unique()))
+            if list_selected:
+                filtered_data = filtered_data[filtered_data['Lists'].isin(list_selected)]
 
-        # Filtracja po "Przeznaczenie" z nazwą "Przeznaczenie (drop down)"
+        # Filtracja po "Przeznaczenie" z nazwą "Przeznaczenie (drop down)" i wielowymiarowym wyborem
         if 'Przeznaczenie' in df.columns:
-            przeznaczenie_selected = st.selectbox("Przeznaczenie (drop down)", ['Wszystkie'] + list(filtered_data['Przeznaczenie'].unique()))
-            if przeznaczenie_selected != 'Wszystkie':
-                filtered_data = filtered_data[filtered_data['Przeznaczenie'] == przeznaczenie_selected]
+            przeznaczenie_selected = st.multiselect("Przeznaczenie (drop down)", list(filtered_data['Przeznaczenie'].unique()))
+            if przeznaczenie_selected:
+                filtered_data = filtered_data[filtered_data['Przeznaczenie'].isin(przeznaczenie_selected)]
+
+        # Usuwanie NaN w wynikach po filtracji
+        filtered_data = filtered_data.dropna()  # Usuwa wiersze z NaN w wynikach filtracji
 
         # Wyświetlenie przefiltrowanych danych
         st.write("Dane po zastosowaniu filtrów:", filtered_data)
