@@ -1,66 +1,49 @@
-import streamlit as st
 import pandas as pd
+import streamlit as st
 
-# Wybór pliku (CSV lub Excel)
-uploaded_file = st.file_uploader("Wybierz plik CSV lub Excel", type=["csv", "xlsx"])
+# Wgranie pliku CSV
+uploaded_file = st.file_uploader("Wgrać plik CSV", type=["csv"])
+
+# Wybór separatora
+separator = st.selectbox("Wybierz separator", [',', ';', '\t', ' '])
 
 if uploaded_file is not None:
-    # Sprawdzenie, czy plik to CSV czy Excel
-    if uploaded_file.name.endswith('.csv'):
-        # Wczytanie pliku CSV
-        df = pd.read_csv(uploaded_file)
-    elif uploaded_file.name.endswith('.xlsx'):
-        # Wczytanie pliku Excel
-        df = pd.read_excel(uploaded_file)
-
-    # Sprawdzanie, czy kolumna 'tags' istnieje w pliku
-    if 'tags' in df.columns:
-        # Dodanie opcji 'Wszystkie modele' w filtrze 'tags'
-        tag_selected = st.selectbox("Wybierz model, aby zobaczyć szczegóły", ['Wszystkie modele'] + list(df['tags'].unique()))
-
-        # Jeżeli wybrano 'Wszystkie modele', zliczamy wszystkie tagi razem
-        if tag_selected == 'Wszystkie modele':
-            filtered_data = df
-            grouped_data = filtered_data.groupby('tags').size().reset_index(name='Liczba wystąpień')
-            st.write(f"Grupa: Wszystkie modele (razem {grouped_data['Liczba wystąpień'].sum()} sztuk)", grouped_data)
-        else:
-            # Filtrowanie danych po wybranym modelu
-            filtered_data = df[df['tags'] == tag_selected]
+    try:
+        # Wczytanie pliku CSV z wybranym separatorem
+        df = pd.read_csv(uploaded_file, sep=separator, encoding='utf-8', on_bad_lines='skip')
+        st.write("Plik został wczytany poprawnie!")
         
-        # Opcjonalne filtry: Lists, Przeznaczenie, Procesor i Model Procesora
-        # Filtracja po "Lists" z nazwą "Wybierz dostawę"
-        if 'Lists' in df.columns:
-            list_selected = st.selectbox("Wybierz dostawę (opcjonalnie)", ['Wszystkie'] + list(filtered_data['Lists'].unique()))
-            if list_selected != 'Wszystkie':
-                filtered_data = filtered_data[filtered_data['Lists'] == list_selected]
-
-        # Filtracja po "Przeznaczenie" z nazwą "Przeznaczenie"
-        if 'Przeznaczenie' in df.columns:
-            przeznaczenie_selected = st.selectbox("Przeznaczenie", ['Wszystkie'] + list(filtered_data['Przeznaczenie'].unique()))
-            if przeznaczenie_selected != 'Wszystkie':
-                filtered_data = filtered_data[filtered_data['Przeznaczenie'] == przeznaczenie_selected]
-
-        # Filtracja po "Procesor" z nazwą "Procesor"
-        if 'Procesor (drop down)' in df.columns:
-            procesor_selected = st.selectbox("Procesor", ['Wszystkie'] + list(filtered_data['Procesor (drop down)'].unique()))
-            if procesor_selected != 'Wszystkie':
-                filtered_data = filtered_data[filtered_data['Procesor (drop down)'] == procesor_selected]
-
-        # Filtracja po "Model Procesora" z nazwą "Model Procesora"
-        if 'Model Procesora (short text)' in df.columns:
-            model_procesora_selected = st.selectbox("Model Procesora", ['Wszystkie'] + list(filtered_data['Model Procesora (short text)'].unique()))
-            if model_procesora_selected != 'Wszystkie':
-                filtered_data = filtered_data[filtered_data['Model Procesora (short text)'] == model_procesora_selected]
-
-        # Usuwanie NaN w wynikach po filtracji
-        filtered_data = filtered_data.dropna()  # Usuwa wiersze z NaN w wynikach filtracji
-
-        # Jeśli po filtracji dane są puste, informujemy użytkownika
-        if filtered_data.empty:
-            st.write("Brak danych spełniających wybrane kryteria.")
+        # Sprawdzenie, czy kolumna "Przeznaczenie (drop down)" istnieje
+        if "Przeznaczenie (drop down)" not in df.columns:
+            st.error("Kolumna 'Przeznaczenie (drop down)' nie istnieje w pliku CSV. Sprawdź nazwy kolumn.")
         else:
-            # Wyświetlenie przefiltrowanych danych
-            st.write("Dane po zastosowaniu filtrów:", filtered_data)
-
-    else:
-        st.warning("Brak kolumny 'tags' w pliku.")
+            # Wyświetlanie oryginalnych danych
+            st.write("### Oryginalny DataFrame")
+            st.dataframe(df, height=500)  # Wysokość tabeli: 500 pikseli
+            
+            # Sekcja filtrowania
+            st.write("### Filtrowanie po przeznaczeniu")
+            
+            # Pobranie unikalnych wartości z kolumny "Przeznaczenie (drop down)"
+            unique_destinations = df["Przeznaczenie (drop down)"].unique().tolist()
+            unique_destinations.insert(0, "Wszystkie")  # Dodanie opcji "Wszystkie"
+            
+            # Dropdown do wyboru przeznaczenia
+            selected_destination = st.selectbox("Wybierz przeznaczenie", unique_destinations)
+            
+            # Filtrowanie danych
+            if selected_destination == "Wszystkie":
+                filtered_df = df  # Pokazuje wszystkie dane
+            else:
+                filtered_df = df[df["Przeznaczenie (drop down)"] == selected_destination]
+            
+            # Wyświetlanie przefiltrowanych danych
+            st.write(f"### Dane dla przeznaczenia: {selected_destination}")
+            st.dataframe(filtered_df, height=500)  # Wysokość tabeli: 500 pikseli
+    
+    except pd.errors.ParserError:
+        st.error("Błąd parsowania pliku CSV. Sprawdź, czy separator jest poprawny.")
+    except UnicodeDecodeError:
+        st.error("Błąd kodowania. Spróbuj zmienić kodowanie pliku na UTF-8.")
+    except Exception as e:
+        st.error(f"Nieoczekiwany błąd: {e}")
