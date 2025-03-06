@@ -1,6 +1,9 @@
 import pandas as pd
 import streamlit as st
 
+# Włączenie szerokiego trybu
+st.set_page_config(layout="wide")
+
 # Tytuł aplikacji
 st.title("Magazyn z ClickUp - aktualizacja 06.03.2025 - wersja BETA")
 
