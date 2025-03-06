@@ -34,9 +34,9 @@ if uploaded_file is not None:
             if list_selected != 'Wszystkie':
                 filtered_data = filtered_data[filtered_data['Lists'] == list_selected]
 
-        # Filtracja po "Przeznaczenie" (drop down)
+        # Filtracja po "Przeznaczenie" z nazwą "Przeznaczenie (drop down)"
         if 'Przeznaczenie' in df.columns:
-            przeznaczenie_selected = st.selectbox("Wybierz Przeznaczenie (opcjonalnie)", ['Wszystkie'] + list(filtered_data['Przeznaczenie'].unique()))
+            przeznaczenie_selected = st.selectbox("Przeznaczenie (drop down)", ['Wszystkie'] + list(filtered_data['Przeznaczenie'].unique()))
             if przeznaczenie_selected != 'Wszystkie':
                 filtered_data = filtered_data[filtered_data['Przeznaczenie'] == przeznaczenie_selected]
 
