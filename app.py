@@ -25,44 +25,32 @@ if uploaded_file is not None:
             selected_tag = st.sidebar.selectbox("Wybierz tag", ["Wszystkie"] + unique_tags)
             
             # Filtr dla "Procesor" (drop down)
-            if "Procesor" in df.columns:
-                unique_processors = df["Procesor"].unique().tolist()
-                selected_processor = st.sidebar.selectbox("Wybierz procesor", ["Wszystkie"] + unique_processors)
-            else:
-                st.sidebar.warning("Kolumna 'Procesor' nie istnieje w pliku CSV.")
-                selected_processor = "Wszystkie"
+            unique_processors = df["Procesor"].unique().tolist()
+            selected_processor = st.sidebar.selectbox("Wybierz procesor", ["Wszystkie"] + unique_processors)
             
             # Filtr dla "Model Procesora" (short text)
-            if "Model Procesora" in df.columns:
-                model_processor = st.sidebar.text_input("Wprowadź model procesora", "")
-            else:
-                st.sidebar.warning("Kolumna 'Model Procesora' nie istnieje w pliku CSV.")
-                model_processor = ""
+            processor_model = st.sidebar.text_input("Model Procesora", "")
             
             # Filtr dla "Rozdzielczość" (drop down)
-            if "Rozdzielczość" in df.columns:
-                unique_resolutions = df["Rozdzielczość"].unique().tolist()
-                selected_resolution = st.sidebar.selectbox("Wybierz rozdzielczość", ["Wszystkie"] + unique_resolutions)
-            else:
-                st.sidebar.warning("Kolumna 'Rozdzielczość' nie istnieje w pliku CSV.")
-                selected_resolution = "Wszystkie"
+            unique_resolutions = df["Rozdzielczość"].unique().tolist()
+            selected_resolution = st.sidebar.selectbox("Wybierz rozdzielczość", ["Wszystkie"] + unique_resolutions)
             
             # Filtrowanie danych
             filtered_df = df.copy()
             
-            # Filtr dla "tags"
+            # Filtrowanie po "tags"
             if selected_tag != "Wszystkie":
                 filtered_df = filtered_df[filtered_df["tags"] == selected_tag]
-            
-            # Filtr dla "Procesor"
+                
+            # Filtrowanie po "Procesor"
             if selected_processor != "Wszystkie":
                 filtered_df = filtered_df[filtered_df["Procesor"] == selected_processor]
-            
-            # Filtr dla "Model Procesora" (częściowe dopasowanie)
-            if model_processor:
-                filtered_df = filtered_df[filtered_df["Model Procesora"].str.contains(model_processor, case=False, na=False)]
-            
-            # Filtr dla "Rozdzielczość"
+                
+            # Filtrowanie po "Model Procesora" (częściowe dopasowanie)
+            if processor_model:
+                filtered_df = filtered_df[filtered_df["Model Procesora"].str.contains(processor_model, case=False, na=False)]
+                
+            # Filtrowanie po "Rozdzielczość"
             if selected_resolution != "Wszystkie":
                 filtered_df = filtered_df[filtered_df["Rozdzielczość"] == selected_resolution]
             
@@ -74,5 +62,7 @@ if uploaded_file is not None:
         st.error(f"Błąd parsowania pliku CSV: {e}")
     except UnicodeDecodeError as e:
         st.error(f"Błąd kodowania: {e}")
+    except KeyError as e:
+        st.error(f"Brak wymaganej kolumny w pliku CSV: {e}")
     except Exception as e:
         st.error(f"Nieoczekiwany błąd: {e}")
