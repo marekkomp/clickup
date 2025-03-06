@@ -35,6 +35,10 @@ try:
         unique_resolutions = df["Rozdzielczość (drop down)"].unique().tolist()
         selected_resolution = st.sidebar.selectbox("Wybierz rozdzielczość", ["Wszystkie"] + unique_resolutions)
         
+        # Filtr dla "Przeznaczenie (drop down)" z multiwyborem
+        unique_destinations = df["Przeznaczenie (drop down)"].unique().tolist()
+        selected_destinations = st.sidebar.multiselect("Wybierz przeznaczenie", unique_destinations)
+        
         # Filtrowanie danych
         filtered_df = df.copy()
         
@@ -53,6 +57,10 @@ try:
         # Filtrowanie po "Rozdzielczość (drop down)"
         if selected_resolution != "Wszystkie":
             filtered_df = filtered_df[filtered_df["Rozdzielczość (drop down)"] == selected_resolution]
+            
+        # Filtrowanie po "Przeznaczenie (drop down)" z multiwyborem
+        if selected_destinations:  # Jeśli wybrano jakiekolwiek wartości
+            filtered_df = filtered_df[filtered_df["Przeznaczenie (drop down)"].isin(selected_destinations)]
         
         # Wyświetlanie przefiltrowanych danych
         st.write("### Przefiltrowane dane")
