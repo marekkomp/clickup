@@ -30,18 +30,18 @@ if uploaded_file is not None:
             # Filtrowanie danych po wybranym tagu
             filtered_data = df[df['tags'] == tag_selected]
         
-        # Opcjonalne filtry: Lists i Przeznaczenie z wielowymiarowym wyborem
-        # Filtracja po "Lists" z wielowymiarowym wyborem
+        # Opcjonalne filtry: Lists i Przeznaczenie
+        # Filtracja po "Lists"
         if 'Lists' in df.columns:
-            list_selected = st.multiselect("Wybierz Listę (opcjonalnie)", list(filtered_data['Lists'].unique()))
-            if list_selected:
-                filtered_data = filtered_data[filtered_data['Lists'].isin(list_selected)]
+            list_selected = st.selectbox("Wybierz Listę (opcjonalnie)", ['Wszystkie'] + list(filtered_data['Lists'].unique()))
+            if list_selected != 'Wszystkie':
+                filtered_data = filtered_data[filtered_data['Lists'] == list_selected]
 
-        # Filtracja po "Przeznaczenie" z nazwą "Przeznaczenie (drop down)" i wielowymiarowym wyborem
+        # Filtracja po "Przeznaczenie" z nazwą "Przeznaczenie (drop down)"
         if 'Przeznaczenie' in df.columns:
-            przeznaczenie_selected = st.multiselect("Przeznaczenie (drop down)", list(filtered_data['Przeznaczenie'].unique()))
-            if przeznaczenie_selected:
-                filtered_data = filtered_data[filtered_data['Przeznaczenie'].isin(przeznaczenie_selected)]
+            przeznaczenie_selected = st.selectbox("Przeznaczenie (drop down)", ['Wszystkie'] + list(filtered_data['Przeznaczenie'].unique()))
+            if przeznaczenie_selected != 'Wszystkie':
+                filtered_data = filtered_data[filtered_data['Przeznaczenie'] == przeznaczenie_selected]
 
         # Usuwanie NaN w wynikach po filtracji
         filtered_data = filtered_data.dropna()  # Usuwa wiersze z NaN w wynikach filtracji
