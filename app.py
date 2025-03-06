@@ -13,37 +13,29 @@ if uploaded_file is not None:
         df = pd.read_csv(uploaded_file, sep=separator, encoding='utf-8', on_bad_lines='skip')
         st.write("Plik został wczytany poprawnie!")
         
-        # Sprawdzenie, czy kolumna "Przeznaczenie (drop down)" istnieje
-        if "Przeznaczenie (drop down)" not in df.columns:
-            st.error("Kolumna 'Przeznaczenie (drop down)' nie istnieje w pliku CSV. Sprawdź nazwy kolumn.")
+        # Sprawdzenie, czy kolumna "tags" istnieje
+        if "tags" not in df.columns:
+            st.error("Brak kolumny 'tags' w pliku CSV. Sprawdź plik.")
         else:
-            # Wyświetlanie oryginalnych danych
-            st.write("### Oryginalny DataFrame")
-            st.dataframe(df, height=500)  # Wysokość tabeli: 500 pikseli
+            # Filtry po lewej stronie
+            st.sidebar.header("Filtry")
             
-            # Sekcja filtrowania
-            st.write("### Filtrowanie po przeznaczeniu")
-            
-            # Pobranie unikalnych wartości z kolumny "Przeznaczenie (drop down)"
-            unique_destinations = df["Przeznaczenie (drop down)"].unique().tolist()
-            unique_destinations.insert(0, "Wszystkie")  # Dodanie opcji "Wszystkie"
-            
-            # Dropdown do wyboru przeznaczenia
-            selected_destination = st.selectbox("Wybierz przeznaczenie", unique_destinations)
+            # Filtr dla "tags"
+            unique_tags = df["tags"].unique().tolist()
+            selected_tag = st.sidebar.selectbox("Wybierz tag", ["Wszystkie"] + unique_tags)
             
             # Filtrowanie danych
-            if selected_destination == "Wszystkie":
-                filtered_df = df  # Pokazuje wszystkie dane
-            else:
-                filtered_df = df[df["Przeznaczenie (drop down)"] == selected_destination]
+            filtered_df = df.copy()
+            if selected_tag != "Wszystkie":
+                filtered_df = filtered_df[filtered_df["tags"] == selected_tag]
             
             # Wyświetlanie przefiltrowanych danych
-            st.write(f"### Dane dla przeznaczenia: {selected_destination}")
-            st.dataframe(filtered_df, height=500)  # Wysokość tabeli: 500 pikseli
+            st.write("### Przefiltrowane dane")
+            st.dataframe(filtered_df, height=500)  # Tabela o wysokości 500 pikseli
     
-    except pd.errors.ParserError:
-        st.error("Błąd parsowania pliku CSV. Sprawdź, czy separator jest poprawny.")
-    except UnicodeDecodeError:
-        st.error("Błąd kodowania. Spróbuj zmienić kodowanie pliku na UTF-8.")
+    except pd.errors.ParserError as e:
+        st.error(f"Błąd parsowania pliku CSV: {e}")
+    except UnicodeDecodeError as e:
+        st.error(f"Błąd kodowania: {e}")
     except Exception as e:
         st.error(f"Nieoczekiwany błąd: {e}")
