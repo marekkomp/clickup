@@ -55,8 +55,12 @@ if uploaded_file is not None:
         # Usuwanie NaN w wynikach po filtracji
         filtered_data = filtered_data.dropna()  # Usuwa wiersze z NaN w wynikach filtracji
 
-        # Wyświetlenie przefiltrowanych danych
-        st.write("Dane po zastosowaniu filtrów:", filtered_data)
+        # Jeśli po filtracji dane są puste, informujemy użytkownika
+        if filtered_data.empty:
+            st.write("Brak danych spełniających wybrane kryteria.")
+        else:
+            # Wyświetlenie przefiltrowanych danych
+            st.write("Dane po zastosowaniu filtrów:", filtered_data)
 
     else:
         st.warning("Brak kolumny 'tags' w pliku.")
