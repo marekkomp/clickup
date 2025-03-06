@@ -18,14 +18,18 @@ if uploaded_file is not None:
 
     # Sprawdzanie, czy kolumna 'tags' istnieje w pliku
     if 'tags' in df.columns:
-        # Grupowanie danych po 'tags' i zliczanie liczby wystąpień każdego tagu
-        grouped_data = df.groupby('tags').size().reset_index(name='Liczba wystąpień')
+        # Dodanie opcji 'Wszystkie' w filtrze 'tags'
+        tag_selected = st.selectbox("Wybierz tag, aby zobaczyć szczegóły", ['Wszystkie'] + list(df['tags'].unique()))
 
-        # Wybór tagu
-        tag_selected = st.selectbox("Wybierz tag, aby zobaczyć szczegóły", grouped_data['tags'])
-
-        # Filtrowanie danych po wybranym tagu
-        filtered_data = df[df['tags'] == tag_selected]
+        # Jeżeli wybrano 'Wszystkie', zliczamy wszystkie tagi razem
+        if tag_selected == 'Wszystkie':
+            filtered_data = df
+            grouped_data = filtered_data.groupby('tags').size().reset_index(name='Liczba wystąpień')
+            st.write(f"Grupa: Wszystkie tagi (razem {grouped_data['Liczba wystąpień'].sum()} sztuk)", grouped_data)
+        else:
+            # Filtrowanie danych po wybranym tagu
+            filtered_data = df[df['tags'] == tag_selected]
+            st.write(f"Lista urządzeń dla tagu: {tag_selected}", filtered_data)
 
         # Opcjonalne filtry: Lists i Przeznaczenie
         # Filtracja po "Lists"
@@ -40,8 +44,8 @@ if uploaded_file is not None:
             if przeznaczenie_selected != 'Wszystkie':
                 filtered_data = filtered_data[filtered_data['Przeznaczenie'] == przeznaczenie_selected]
 
-        # Wyświetlenie pogrupowanych danych
-        st.write(f"Lista urządzeń dla tagu: {tag_selected}", filtered_data)
+        # Wyświetlenie przefiltrowanych danych
+        st.write("Dane po zastosowaniu filtrów:", filtered_data)
 
     else:
         st.warning("Brak kolumny 'tags' w pliku.")
