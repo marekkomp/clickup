@@ -27,7 +27,7 @@ if uploaded_file is not None:
             # Filtrowanie danych po wybranym modelu
             filtered_data = df[df['tags'] == tag_selected]
         
-        # Opcjonalne filtry: Lists i Przeznaczenie
+        # Opcjonalne filtry: Lists, Przeznaczenie, Procesor i Model Procesora
         # Filtracja po "Lists" z nazwą "Wybierz dostawę"
         if 'Lists' in df.columns:
             list_selected = st.selectbox("Wybierz dostawę (opcjonalnie)", ['Wszystkie'] + list(filtered_data['Lists'].unique()))
@@ -39,6 +39,21 @@ if uploaded_file is not None:
             przeznaczenie_selected = st.selectbox("Przeznaczenie", ['Wszystkie'] + list(filtered_data['Przeznaczenie'].unique()))
             if przeznaczenie_selected != 'Wszystkie':
                 filtered_data = filtered_data[filtered_data['Przeznaczenie'] == przeznaczenie_selected]
+
+        # Filtracja po "Procesor" z nazwą "Procesor"
+        if 'Procesor (drop down)' in df.columns:
+            procesor_selected = st.selectbox("Procesor", ['Wszystkie'] + list(filtered_data['Procesor (drop down)'].unique()))
+            if procesor_selected != 'Wszystkie':
+                filtered_data = filtered_data[filtered_data['Procesor (drop down)'] == procesor_selected]
+
+        # Filtracja po "Model Procesora" z nazwą "Model Procesora"
+        if 'Model Procesora (short text)' in df.columns:
+            model_procesora_selected = st.selectbox("Model Procesora", ['Wszystkie'] + list(filtered_data['Model Procesora (short text)'].unique()))
+            if model_procesora_selected != 'Wszystkie':
+                filtered_data = filtered_data[filtered_data['Model Procesora (short text)'] == model_procesora_selected]
+
+        # Usuwanie NaN w wynikach po filtracji
+        filtered_data = filtered_data.dropna()  # Usuwa wiersze z NaN w wynikach filtracji
 
         # Wyświetlenie przefiltrowanych danych
         st.write("Dane po zastosowaniu filtrów:", filtered_data)
