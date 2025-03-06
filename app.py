@@ -42,6 +42,10 @@ try:
         unique_destinations = df["Przeznaczenie (drop down)"].unique().tolist()
         selected_destinations = st.sidebar.multiselect("Wybierz przeznaczenie", unique_destinations)
         
+        # Filtr dla "Lists"
+        unique_lists = df["Lists"].unique().tolist()
+        selected_list = st.sidebar.selectbox("Wybierz listę", ["Wszystkie"] + unique_lists)
+        
         # Filtrowanie danych
         filtered_df = df.copy()
         
@@ -64,6 +68,10 @@ try:
         # Filtrowanie po "Przeznaczenie (drop down)" z multiwyborem
         if selected_destinations:  # Jeśli wybrano jakiekolwiek wartości
             filtered_df = filtered_df[filtered_df["Przeznaczenie (drop down)"].isin(selected_destinations)]
+            
+        # Filtrowanie po "Lists"
+        if selected_list != "Wszystkie":
+            filtered_df = filtered_df[filtered_df["Lists"] == selected_list]
         
         # Wyświetlanie przefiltrowanych danych
         st.write("### Przefiltrowane dane")
