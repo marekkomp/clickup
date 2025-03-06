@@ -16,10 +16,24 @@ if uploaded_file is not None:
     # Wyświetlenie surowych danych
     st.write("Dane z pliku:", df)
 
-    # Grupowanie po kolumnie "tags" i obliczanie sumy w pozostałych kolumnach
+    # Sprawdzanie, czy kolumna 'tags' istnieje w pliku
     if 'tags' in df.columns:
-        grouped_data = df.groupby('tags').sum()
-        # Wyświetlenie pogrupowanych danych
-        st.write("Dane pogrupowane po modelach (tags):", grouped_data)
+        # Grupowanie danych po 'tags' i zliczanie liczby wystąpień każdego tagu
+        grouped_data = df.groupby('tags').size().reset_index(name='Liczba wystąpień')
+
+        # Stworzenie rozwijanego panelu do wyświetlania wyników grupowania
+        with st.expander("Kliknij, aby rozwinąć grupy po tagach"):
+            # Wyświetlenie pogrupowanych danych
+            st.write(grouped_data)
+
+        # Wybór tagu do szczegółowego podglądu
+        tag_selected = st.selectbox("Wybierz tag, aby zobaczyć szczegóły", grouped_data['tags'])
+
+        # Filtrowanie danych dla wybranego tagu
+        filtered_data = df[df['tags'] == tag_selected]
+
+        # Wyświetlenie szczegółów dla wybranego tagu
+        st.write(f"Lista urządzeń dla tagu: {tag_selected}", filtered_data)
+
     else:
         st.warning("Brak kolumny 'tags' w pliku.")
