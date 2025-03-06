@@ -24,15 +24,15 @@ if uploaded_file is not None:
             unique_tags = df["tags"].unique().tolist()
             selected_tag = st.sidebar.selectbox("Wybierz tag", ["Wszystkie"] + unique_tags)
             
-            # Filtr dla "Procesor" (drop down)
-            unique_processors = df["Procesor"].unique().tolist()
+            # Filtr dla "Procesor (drop down)"
+            unique_processors = df["Procesor (drop down)"].unique().tolist()
             selected_processor = st.sidebar.selectbox("Wybierz procesor", ["Wszystkie"] + unique_processors)
             
-            # Filtr dla "Model Procesora" (short text)
-            processor_model = st.sidebar.text_input("Model Procesora", "")
+            # Filtr dla "Model Procesora (short text)"
+            processor_model = st.sidebar.text_input("Model Procesora (short text)", "")
             
-            # Filtr dla "Rozdzielczość" (drop down)
-            unique_resolutions = df["Rozdzielczość"].unique().tolist()
+            # Filtr dla "Rozdzielczość (drop down)"
+            unique_resolutions = df["Rozdzielczość (drop down)"].unique().tolist()
             selected_resolution = st.sidebar.selectbox("Wybierz rozdzielczość", ["Wszystkie"] + unique_resolutions)
             
             # Filtrowanie danych
@@ -42,17 +42,17 @@ if uploaded_file is not None:
             if selected_tag != "Wszystkie":
                 filtered_df = filtered_df[filtered_df["tags"] == selected_tag]
                 
-            # Filtrowanie po "Procesor"
+            # Filtrowanie po "Procesor (drop down)"
             if selected_processor != "Wszystkie":
-                filtered_df = filtered_df[filtered_df["Procesor"] == selected_processor]
+                filtered_df = filtered_df[filtered_df["Procesor (drop down)"] == selected_processor]
                 
-            # Filtrowanie po "Model Procesora" (częściowe dopasowanie)
+            # Filtrowanie po "Model Procesora (short text)" (częściowe dopasowanie)
             if processor_model:
-                filtered_df = filtered_df[filtered_df["Model Procesora"].str.contains(processor_model, case=False, na=False)]
+                filtered_df = filtered_df[filtered_df["Model Procesora (short text)"].str.contains(processor_model, case=False, na=False)]
                 
-            # Filtrowanie po "Rozdzielczość"
+            # Filtrowanie po "Rozdzielczość (drop down)"
             if selected_resolution != "Wszystkie":
-                filtered_df = filtered_df[filtered_df["Rozdzielczość"] == selected_resolution]
+                filtered_df = filtered_df[filtered_df["Rozdzielczość (drop down)"] == selected_resolution]
             
             # Wyświetlanie przefiltrowanych danych
             st.write("### Przefiltrowane dane")
