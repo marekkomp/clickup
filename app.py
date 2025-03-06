@@ -15,11 +15,8 @@ if uploaded_file is not None:
 
     # Sprawdzanie, czy kolumna 'tags' istnieje w pliku
     if 'tags' in df.columns:
-        # Grupowanie danych po 'tags' i zliczanie liczby wystąpień każdego tagu
-        grouped_data = df.groupby('tags').size().reset_index(name='Liczba wystąpień')
-
-        # Wybór tagu
-        tag_selected = st.selectbox("Wybierz tag, aby zobaczyć szczegóły", ['Wszystkie'] + list(grouped_data['tags']))
+        # Dodanie opcji 'Wszystkie' w filtrze 'tags'
+        tag_selected = st.selectbox("Wybierz tag, aby zobaczyć szczegóły", ['Wszystkie'] + list(df['tags'].unique()))
 
         # Jeżeli wybrano 'Wszystkie', zliczamy wszystkie tagi razem
         if tag_selected == 'Wszystkie':
@@ -29,8 +26,7 @@ if uploaded_file is not None:
         else:
             # Filtrowanie danych po wybranym tagu
             filtered_data = df[df['tags'] == tag_selected]
-            st.write(f"Lista urządzeń dla tagu: {tag_selected}", filtered_data)
-
+        
         # Opcjonalne filtry: Lists i Przeznaczenie
         # Filtracja po "Lists"
         if 'Lists' in df.columns:
