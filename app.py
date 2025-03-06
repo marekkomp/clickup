@@ -1,53 +1,39 @@
-import pandas as pd
 import streamlit as st
+import pandas as pd
 
-# Wgranie pliku CSV
-uploaded_file = st.file_uploader("Wgrać plik CSV", type=["csv"])
-
-# Wybór separatora
-separator = st.selectbox("Wybierz separator", [',', ';', '\t', ' '])
+# Wybór pliku (CSV lub Excel)
+uploaded_file = st.file_uploader("Wybierz plik CSV lub Excel", type=["csv", "xlsx"])
 
 if uploaded_file is not None:
-    try:
-        # Wczytanie pliku CSV z wybranym separatorem
-        df = pd.read_csv(uploaded_file, sep=separator, encoding='utf-8', on_bad_lines='skip')
-        st.write("Plik został wczytany poprawnie!")
-        
-        # Sprawdzenie, czy kolumna "Przeznaczenie" istnieje
-        if "Przeznaczenie" not in df.columns:
-            st.error("Kolumna 'Przeznaczenie' nie istnieje w pliku CSV. Sprawdź nazwy kolumn.")
-        else:
-            # Wyświetlanie oryginalnych danych z większą wysokością
-            st.write("### Oryginalny DataFrame")
-            st.dataframe(df, height=500)  # Tabela ma wysokość 500 pikseli
-            
-            # Sekcja filtrowania po "Przeznaczenie"
-            st.write("### Filtrowanie po przeznaczeniu")
-            
-            # Pobranie unikalnych wartości z kolumny "Przeznaczenie"
-            unique_destinations = df["Przeznaczenie"].unique().tolist()
-            
-            # Dodanie opcji "Wszystkie" na początku listy
-            unique_destinations.insert(0, "Wszystkie")
-            
-            # Dropdown do wyboru przeznaczenia
-            selected_destination = st.selectbox("Wybierz przeznaczenie", unique_destinations)
-            
-            # Filtrowanie danych
-            if selected_destination == "Wszystkie":
-                filtered_df = df  # Pokaż wszystkie dane
-            else:
-                filtered_df = df[df["Przeznaczenie"] == selected_destination]
-            
-            # Wyświetlanie przefiltrowanych danych z większą wysokością
-            st.write(f"### Dane dla przeznaczenia: {selected_destination}")
-            st.dataframe(filtered_df, height=500)  # Tabela ma wysokość 500 pikseli
-    
-    except pd.errors.ParserError as e:
-        st.error(f"Błąd parsowania pliku CSV: {e}")
-        st.write("Sprawdź, czy separator jest poprawny.")
-    except UnicodeDecodeError as e:
-        st.error(f"Błąd kodowania: {e}")
-        st.write("Spróbuj zmienić kodowanie pliku na UTF-8.")
-    except Exception as e:
-        st.error(f"Nieoczekiwany błąd: {e}")
+    # Sprawdzenie, czy plik to CSV czy Excel
+    if uploaded_file.name.endswith('.csv'):
+        # Wczytanie pliku CSV
+        df = pd.read_csv(uploaded_file)
+    elif uploaded_file.name.endswith('.xlsx'):
+        # Wczytanie pliku Excel
+        df = pd.read_excel(uploaded_file)
+
+    # Wyświetlenie surowych danych
+    st.write("Dane z pliku:", df)
+
+    # Sprawdzanie, czy kolumna 'tags' istnieje w pliku
+    if 'tags' in df.columns:
+        # Grupowanie danych po 'tags' i zliczanie liczby wystąpień każdego tagu
+        grouped_data = df.groupby('tags').size().reset_index(name='Liczba wystąpień')
+
+        # Stworzenie rozwijanego panelu do wyświetlania wyników grupowania
+        with st.expander("Kliknij, aby rozwinąć grupy po tagach"):
+            # Wyświetlenie pogrupowanych danych
+            st.write(grouped_data)
+
+        # Wybór tagu do szczegółowego podglądu
+        tag_selected = st.selectbox("Wybierz tag, aby zobaczyć szczegóły", grouped_data['tags'])
+
+        # Filtrowanie danych dla wybranego tagu
+        filtered_data = df[df['tags'] == tag_selected]
+
+        # Wyświetlenie szczegółów dla wybranego tagu
+        st.write(f"Lista urządzeń dla tagu: {tag_selected}", filtered_data)
+
+    else:
+        st.warning("Brak kolumny 'tags' w pliku.")
