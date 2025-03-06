@@ -28,7 +28,7 @@ if uploaded_file is not None:
             unique_processors = df["Procesor (drop down)"].unique().tolist()
             selected_processor = st.sidebar.selectbox("Wybierz procesor", ["Wszystkie"] + unique_processors)
             
-            # Filtr dla "Model Procesora (short text)" - zmieniony na drop down
+            # Filtr dla "Model Procesora (short text)"
             unique_processor_models = df["Model Procesora (short text)"].unique().tolist()
             selected_processor_model = st.sidebar.selectbox("Wybierz model procesora", ["Wszystkie"] + unique_processor_models)
             
@@ -58,6 +58,9 @@ if uploaded_file is not None:
             # Wyświetlanie przefiltrowanych danych
             st.write("### Przefiltrowane dane")
             st.dataframe(filtered_df, height=500)  # Tabela o wysokości 500 pikseli
+            
+            # Wyświetlanie liczby pokazywanych pozycji
+            st.write(f"Liczba pokazywanych pozycji: {len(filtered_df)}")
     
     except pd.errors.ParserError as e:
         st.error(f"Błąd parsowania pliku CSV: {e}")
